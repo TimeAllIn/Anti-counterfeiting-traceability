@@ -1,0 +1,299 @@
+[gd_scene format=3 uid="uid://c8f3qesfr86ix"]
+
+[sub_resource type="GDScript" id="GDScript_brmvo"]
+script/source = "extends Control
+
+var 自身数据
+
+func _ready() -> void:
+	Net.conect_net()
+	pass
+
+func 登录():
+	Net.数据传输()
+	var 回传数据 = Net.数据
+	if 回传数据.get($\"登陆界面/公司名称\".text) == null:
+		print(\"登录失败\")
+		return
+	if $\"登陆界面/API\".text != str(回传数据[$\"登陆界面/公司名称\".text][\"API\"]):
+		print(\"登录失败\")
+		return
+	print(\"登录成功\")
+	$\"界面/计时器\".start()
+	自身数据 = 回传数据[$\"登陆界面/公司名称\".text]
+	print(自身数据)
+	$\"登陆界面\".set_visible(false)
+	pass
+
+func 更新数据():
+	Net.数据传输()
+	自身数据 = Net.数据[$\"登陆界面/公司名称\".text]
+	pass
+
+
+func 计时() -> void:
+	for i in $\"界面/滚动/容器\".get_children():
+		if i is u_b:
+			var to_dir :Dictionary = {
+				\"哈希值\": i.哈希值,
+				\"内容\": i.内容			
+			}
+			Net.数据上传(\"防伪码Test\",to_dir)
+	pass # Replace with function body.
+"
+
+[sub_resource type="GDScript" id="GDScript_ym57m"]
+script/source = "extends VBoxContainer
+func 打开(temp):
+	$\"../../内容栏\".打开(temp)
+func 创建防伪码() -> void:
+	$\"../../..\".更新数据()
+	if $\"../../..\".自身数据[\"可用码\"] <= 0:return
+	else:
+		$\"../../..\".自身数据[\"可用码\"] -= 1
+		$\"../../..\".自身数据[\"使用码\"] += 1
+	Net.数据上传($\"../../../登陆界面/公司名称\".text,$\"../../..\".自身数据)
+	var temp_ub = u_b.new($\"../../../登陆界面/公司名称\".text)
+	add_child(temp_ub)
+	temp_ub.text = \"新码\"
+"
+
+[sub_resource type="GDScript" id="GDScript_3hqua"]
+script/source = "extends TabContainer
+var u_button:u_b
+func 重置(is_open:bool = false):
+	for i in get_children():
+		if i.name != \"标准栏\":
+			i.queue_free()
+		else:
+			for i_a in i.get_children():
+				if i_a is TextEdit or i_a is LineEdit:
+					i_a.text = \"\"
+	set_visible(is_open)
+func 打开(ub:u_b):
+	重置(true)
+	u_button = ub
+	$\"标准栏/码点图\".texture = ImageTexture.create_from_image(u_button.code.img)
+	$\"标准栏/名称\".text = u_button.my_name
+	$\"标准栏/描述\".text = u_button.描述
+	for i in u_button.内容:
+		var temp = 新一级码.instantiate()
+		temp.name = i
+		temp.设置值(u_button.内容[i])
+		add_child(temp)	
+	pass
+func 图片保存(path: String) -> void:
+	if u_button != null:
+		u_button.code.creat_path(path)
+	$\"标准栏/文件选择\".set_visible(false)
+func 保存() -> void:
+	if u_button != null:
+		$\"标准栏/文件选择\".set_visible(true)
+func _on_描述_text_changed() -> void:
+	if u_button != null:
+		u_button.描述 = $\"标准栏/描述\".text
+func _on_删除_pressed() -> void:
+	if u_button != null:
+		u_button.queue_free()
+		重置(false)
+func _on_名称_text_submitted(new_text: String) -> void:
+	if u_button != null:
+		u_button.改变名字(new_text)
+const 新一级码 = preload(\"uid://bbbt1brs541ps\")
+func _on_创建_pressed() -> void:
+	if u_button != null:
+		var temp = 新一级码.instantiate()
+		temp.name = str(get_child_count())
+		u_button.内容[temp.name] = \"\"
+		add_child(temp)
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_brmvo"]
+
+[node name="商户端" type="Control" unique_id=2130134527]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_brmvo")
+
+[node name="界面" type="Panel" parent="." unique_id=1244968824]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+metadata/_edit_use_anchors_ = true
+
+[node name="滚动" type="ScrollContainer" parent="界面" unique_id=396039124]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.083333336
+anchor_right = 0.15625
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="容器" type="VBoxContainer" parent="界面/滚动" unique_id=2047490832]
+layout_mode = 2
+size_flags_horizontal = 3
+script = SubResource("GDScript_ym57m")
+
+[node name="创建防伪码" type="Button" parent="界面" unique_id=714689986]
+layout_mode = 0
+anchor_right = 0.15625
+anchor_bottom = 0.06944445
+text = "创建防伪码"
+metadata/_edit_use_anchors_ = true
+
+[node name="内容栏" type="TabContainer" parent="界面" unique_id=1034399471]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15625
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+script = SubResource("GDScript_3hqua")
+metadata/_edit_use_anchors_ = true
+
+[node name="标准栏" type="Control" parent="界面/内容栏" unique_id=681885885]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="码点图" type="TextureRect" parent="界面/内容栏/标准栏" unique_id=694651941]
+texture_filter = 1
+layout_mode = 0
+anchor_left = 0.037037037
+anchor_top = 0.24528302
+anchor_right = 0.4074074
+anchor_bottom = 0.8258346
+metadata/_edit_use_anchors_ = true
+
+[node name="保存" type="Button" parent="界面/内容栏/标准栏" unique_id=1680441905]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.027777778
+anchor_top = 0.8693759
+anchor_right = 0.21296297
+anchor_bottom = 0.94194484
+offset_right = -1.5258789e-05
+text = "保存防伪码"
+metadata/_edit_use_anchors_ = true
+
+[node name="删除" type="Button" parent="界面/内容栏/标准栏" unique_id=1638783129]
+modulate = Color(1, 0, 0, 1)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.39814815
+anchor_top = 0.8693759
+anchor_right = 0.5833333
+anchor_bottom = 0.94194484
+text = "删除防伪码"
+metadata/_edit_use_anchors_ = true
+
+[node name="创建" type="Button" parent="界面/内容栏/标准栏" unique_id=836425325]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7962963
+anchor_top = 0.8693759
+anchor_right = 0.9814815
+anchor_bottom = 0.94194484
+text = "创建下一级码"
+metadata/_edit_use_anchors_ = true
+
+[node name="描述" type="TextEdit" parent="界面/内容栏/标准栏" unique_id=2139551493]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.46296296
+anchor_top = 0.027576197
+anchor_right = 0.9814815
+anchor_bottom = 0.8258346
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "码点的用途以及描述"
+metadata/_edit_use_anchors_ = true
+
+[node name="名称" type="LineEdit" parent="界面/内容栏/标准栏" unique_id=50663785]
+layout_mode = 0
+anchor_left = 0.018518519
+anchor_top = 0.03338171
+anchor_right = 0.44444445
+anchor_bottom = 0.07837445
+placeholder_text = "码点名称"
+metadata/_edit_use_anchors_ = true
+
+[node name="文件选择" type="FileDialog" parent="界面/内容栏/标准栏" unique_id=665546962]
+oversampling_override = 1.0
+access = 2
+filters = PackedStringArray("*.png")
+use_native_dialog = true
+
+[node name="计时器" type="Timer" parent="界面" unique_id=1532413614]
+process_callback = 0
+
+[node name="登陆界面" type="Panel" parent="." unique_id=1050194538]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_brmvo")
+metadata/_edit_lock_ = true
+metadata/_edit_use_anchors_ = true
+
+[node name="公司名称" type="LineEdit" parent="登陆界面" unique_id=1818068728]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.28125
+anchor_top = 0.2638889
+anchor_right = 0.71875
+anchor_bottom = 0.34861112
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "公司名称"
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="API" type="LineEdit" parent="登陆界面" unique_id=1458961665]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.28125
+anchor_top = 0.4027778
+anchor_right = 0.71875
+anchor_bottom = 0.4875
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "API"
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="登录" type="Button" parent="登陆界面" unique_id=1287285780]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4296875
+anchor_top = 0.5972222
+anchor_right = 0.5703125
+anchor_bottom = 0.6666667
+grow_horizontal = 2
+grow_vertical = 2
+text = "登录"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="界面/创建防伪码" to="界面/滚动/容器" method="创建防伪码"]
+[connection signal="pressed" from="界面/内容栏/标准栏/保存" to="界面/内容栏" method="保存"]
+[connection signal="pressed" from="界面/内容栏/标准栏/删除" to="界面/内容栏" method="_on_删除_pressed"]
+[connection signal="pressed" from="界面/内容栏/标准栏/创建" to="界面/内容栏" method="_on_创建_pressed"]
+[connection signal="text_changed" from="界面/内容栏/标准栏/描述" to="界面/内容栏" method="_on_描述_text_changed"]
+[connection signal="text_submitted" from="界面/内容栏/标准栏/名称" to="界面/内容栏" method="_on_名称_text_submitted"]
+[connection signal="file_selected" from="界面/内容栏/标准栏/文件选择" to="界面/内容栏" method="图片保存"]
+[connection signal="timeout" from="界面/计时器" to="." method="计时"]
+[connection signal="pressed" from="登陆界面/登录" to="." method="登录"]

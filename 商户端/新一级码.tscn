@@ -1,0 +1,199 @@
+[gd_scene format=3 uid="uid://bbbt1brs541ps"]
+
+[ext_resource type="Texture2D" uid="uid://dyy6i5p8dxocc" path="res://debug_big.png" id="1_n65lh"]
+
+[sub_resource type="GDScript" id="GDScript_gnvoq"]
+script/source = "extends Control
+
+var 哈希值
+
+func _ready() -> void:
+	var temp_code = Code.new()
+	保存字典[4] = Time.get_datetime_string_from_system()
+	temp_code.生成(保存字典[4])
+	$\"码点图\".texture = ImageTexture.create_from_image(temp_code.img)
+	哈希值 = temp_code.哈希值返回()
+
+
+func _on_描述_text_changed() -> void:
+	保存字典[0] = $\"描述\".text
+	get_parent().u_button.内容[name] = 保存字典
+	pass # Replace with function body.
+
+func 设置值(temp):
+	$\"描述\".text = temp[0]
+	$\"产品名称\".text = temp[1]
+	$\"生产编号\".text = temp[2]
+	$\"生产日期\".text = temp[3]
+	
+	var temp_code = Code.new()
+	保存字典[4] = Time.get_datetime_string_from_system()
+	temp_code.生成(保存字典[4])
+	$\"码点图\".texture = ImageTexture.create_from_image(temp_code.img)
+	哈希值 = temp_code.哈希值返回()
+
+func _on_删除_pressed() -> void:
+	var parent = get_parent()
+	if not parent:
+		return  # 没有父节点，直接退出
+	
+	var my_index = get_index()  # 获取自己的位置
+	var children = parent.get_children()  # 父节点所有子节点
+
+	# 从后往前删，避免删前面导致后面索引错乱
+	for i in range(children.size() - 1, my_index - 1, -1):
+		if get_parent().u_button.内容.get(children[i].name) != null:
+			get_parent().u_button.内容.erase(children[i].name)
+		children[i].queue_free()
+
+	pass # Replace with function body.
+
+
+
+var 保存字典:Array = [\"\",\"\",\"\",\"\",\"\"]
+func 数据保存() -> void:
+	保存字典[0] = $\"描述\".text
+	保存字典[1] = $\"产品名称\".text
+	保存字典[2] = $\"生产编号\".text
+	保存字典[3] = $\"生产日期\".text
+	var to_dir :Dictionary = {
+				\"哈希值\": 哈希值,
+				\"内容\": 保存字典
+			}
+	Net.数据上传(\"防伪码Test\",to_dir)
+	pass
+
+
+func _on_产品名称_text_changed(new_text: String) -> void:
+	保存字典[1] = new_text
+	get_parent().u_button.内容[name] = 保存字典
+	pass # Replace with function body.
+
+
+func _on_生产编号_text_changed(new_text: String) -> void:
+	保存字典[2] = new_text
+	get_parent().u_button.内容[name] = 保存字典
+	pass # Replace with function body.
+
+
+func _on_生产日期_text_changed(new_text: String) -> void:
+	保存字典[3] = new_text
+	get_parent().u_button.内容[name] = 保存字典
+	pass # Replace with function body.
+
+
+func 文件保存(path: String) -> void:
+	
+	var tex = $\"码点图\".texture.get_image()
+	tex.save_png(path)
+	$FileDialog.visible = false
+	pass # Replace with function body.
+
+
+func 保存() -> void:
+	$FileDialog.visible = true
+	pass # Replace with function body.
+"
+
+[node name="新一级码" type="Control" unique_id=1869783523]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_gnvoq")
+metadata/_tab_index = 1
+
+[node name="描述" type="TextEdit" parent="." unique_id=1129703899]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0078125
+anchor_top = 0.6388889
+anchor_right = 0.99375
+anchor_bottom = 0.98888886
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "描述"
+metadata/_edit_use_anchors_ = true
+
+[node name="删除" type="Button" parent="." unique_id=1562457959]
+layout_mode = 0
+anchor_left = 0.859375
+anchor_top = 0.027777778
+anchor_right = 0.984375
+anchor_bottom = 0.07083333
+text = "删除"
+metadata/_edit_use_anchors_ = true
+
+[node name="码点图" type="TextureRect" parent="." unique_id=830116134]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.015625
+anchor_top = 0.027777778
+anchor_right = 0.34375
+anchor_bottom = 0.60832936
+texture = ExtResource("1_n65lh")
+expand_mode = 1
+stretch_mode = 5
+metadata/_edit_use_anchors_ = true
+
+[node name="产品名称" type="LineEdit" parent="." unique_id=1510209519]
+layout_mode = 0
+anchor_left = 0.390625
+anchor_top = 0.027777778
+anchor_right = 0.8359375
+anchor_bottom = 0.09861111
+placeholder_text = "产品名称"
+metadata/_edit_use_anchors_ = true
+
+[node name="生产编号" type="LineEdit" parent="." unique_id=1121508100]
+layout_mode = 0
+anchor_left = 0.390625
+anchor_top = 0.1388889
+anchor_right = 0.9875
+anchor_bottom = 0.20972222
+placeholder_text = "生产编号"
+metadata/_edit_use_anchors_ = true
+
+[node name="生产日期" type="LineEdit" parent="." unique_id=1320164517]
+layout_mode = 0
+anchor_left = 0.390625
+anchor_top = 0.2638889
+anchor_right = 0.9875
+anchor_bottom = 0.33472222
+placeholder_text = "生产日期"
+metadata/_edit_use_anchors_ = true
+
+[node name="码点保存" type="Button" parent="." unique_id=392516015]
+layout_mode = 0
+anchor_left = 0.390625
+anchor_top = 0.43055555
+anchor_right = 0.546875
+anchor_bottom = 0.5416667
+text = "码点保存"
+metadata/_edit_use_anchors_ = true
+
+[node name="数据保存" type="Button" parent="." unique_id=761481103]
+layout_mode = 0
+anchor_left = 0.8203125
+anchor_top = 0.43055555
+anchor_right = 0.9765625
+anchor_bottom = 0.5416667
+text = "数据保存"
+metadata/_edit_use_anchors_ = true
+
+[node name="FileDialog" type="FileDialog" parent="." unique_id=782723486]
+access = 2
+filters = PackedStringArray("*.png")
+use_native_dialog = true
+
+[connection signal="text_changed" from="描述" to="." method="_on_描述_text_changed"]
+[connection signal="pressed" from="删除" to="." method="_on_删除_pressed"]
+[connection signal="text_changed" from="产品名称" to="." method="_on_产品名称_text_changed"]
+[connection signal="text_changed" from="生产编号" to="." method="_on_生产编号_text_changed"]
+[connection signal="text_changed" from="生产日期" to="." method="_on_生产日期_text_changed"]
+[connection signal="pressed" from="码点保存" to="." method="保存"]
+[connection signal="pressed" from="数据保存" to="." method="数据保存"]
+[connection signal="file_selected" from="FileDialog" to="." method="文件保存"]

@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://d3fr74q5hbqgo"]
+
+[sub_resource type="GDScript" id="GDScript_3cm3w"]
+script/source = "extends Panel
+
+var my_data:net_data
+
+func 设置(data:net_data):
+	my_data = data
+	$\"名称\".text = data.公司名称
+	$\"可用码\".value = data.可用码数量
+	$\"使用码\".value = data.已用码数量
+	
+func 更新(可用码,使用码):
+	my_data.可用码数量 = 可用码
+	my_data.已用码数量 = 使用码
+	设置(my_data)
+	pass
+
+
+func _on_可用码_value_changed(value: float) -> void:
+	my_data.可用码数量 = value
+	Net.数据[my_data.公司名称][\"可用码\"] =  value
+	pass # Replace with function body.
+
+
+func _on_使用码_value_changed(value: float) -> void:
+	my_data.已用码数量 = value
+	Net.数据[my_data.公司名称][\"使用码\"] =  value
+	pass # Replace with function body.
+"
+
+[node name="公司" type="Panel" unique_id=674882751]
+custom_minimum_size = Vector2(0, 100)
+script = SubResource("GDScript_3cm3w")
+
+[node name="名称" type="Label" parent="." unique_id=1686687885]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.546875
+anchor_bottom = 1.0013888
+text = "名称"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="可用码" type="SpinBox" parent="." unique_id=1511341643]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7421875
+anchor_top = 0.10138879
+anchor_right = 0.98945314
+anchor_bottom = 0.41138878
+max_value = 999999999.0
+prefix = "可用码个数"
+metadata/_edit_use_anchors_ = true
+
+[node name="使用码" type="SpinBox" parent="." unique_id=392421138]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7421875
+anchor_top = 0.61111104
+anchor_right = 0.98945314
+anchor_bottom = 0.92111105
+max_value = 999999999.0
+prefix = "已用码个数"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="value_changed" from="可用码" to="." method="_on_可用码_value_changed"]
+[connection signal="value_changed" from="使用码" to="." method="_on_使用码_value_changed"]

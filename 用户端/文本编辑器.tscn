@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://drwma2e4eisdj"]
+
+[node name="文本编辑器" type="TextEdit" unique_id=17278107]
+editable = false
+metadata/_tab_index = 0

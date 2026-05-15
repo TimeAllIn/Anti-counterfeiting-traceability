@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://c7tcox7hwfryd"]
+
+[sub_resource type="GDScript" id="GDScript_c0iax"]
+script/source = "extends Control
+func _ready() -> void:
+	Net.conect_net()
+	pass
+func _on_扫码_pressed() -> void:
+	for i in $\"内容\".get_children():
+		i.queue_free()
+	$\"文件选择\".set_visible(true)
+var 哈希值:String
+const 文本编辑器 = preload(\"uid://drwma2e4eisdj\")
+func _on_文件选择_file_selected(path: String) -> void:
+	var image = Image.load_from_file(path)
+	var recode = ReCode.new()
+	var 解密初始时间 = Time.get_ticks_usec()
+	recode.解密(image)
+	哈希值 = recode.自身哈希
+	读取()
+	$\"文件选择\".set_visible(false)
+const 用户扫码 = preload(\"uid://dd2lo7i8yvx8e\")
+func 读取():
+	for i in $\"内容\".get_children():i.queue_free()
+	if 哈希值 == \"\":return
+	Net.用户查询(哈希值)
+	var dir
+	if Net.数据.has(\"防伪码Test\"):
+		dir = Net.数据[\"防伪码Test\"][哈希值]
+	else:
+		dir = Net.数据
+	if dir is Dictionary:
+		print(\"开始多次\")
+		for i in dir:
+			print(i)
+			var temp = 用户扫码.instantiate()
+			temp.name = i
+			temp.set_value(dir[i])
+			$\"内容\".add_child(temp)
+	elif dir is Array:
+		var temp = 用户扫码.instantiate()
+		temp.name = dir[1]
+		temp.set_value(dir)
+		$\"内容\".add_child(temp)
+"
+
+[node name="用户" type="Control" unique_id=616172459]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_c0iax")
+
+[node name="扫码" type="Button" parent="." unique_id=1005786292]
+layout_mode = 0
+anchor_left = 0.0078125
+anchor_top = 0.013888889
+anchor_right = 0.078125
+anchor_bottom = 0.056944445
+offset_bottom = -11.0
+text = "扫码"
+metadata/_edit_use_anchors_ = true
+
+[node name="内容" type="TabContainer" parent="." unique_id=1036781919]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.06944445
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="文件选择" type="FileDialog" parent="." unique_id=1245937679]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png")
+use_native_dialog = true
+
+[connection signal="pressed" from="扫码" to="." method="_on_扫码_pressed"]
+[connection signal="file_selected" from="文件选择" to="." method="_on_文件选择_file_selected"]

@@ -1,0 +1,215 @@
+[gd_scene format=3 uid="uid://dbms646tfvrwq"]
+
+[ext_resource type="Script" uid="uid://bysp8mf4ay33v" path="res://main.gd" id="1_ig7tw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ig7tw"]
+bg_color = Color(0.3019608, 0.3019608, 0.3019608, 1)
+
+[sub_resource type="GDScript" id="GDScript_ig7tw"]
+script/source = "extends Panel
+func 生成():
+	set_visible(true)
+	$\"重置API\".set_visible(false)
+func 退出() -> void:
+	for i in get_children():
+		i.set_visible(true)
+		if i is LineEdit:
+			i.text = \"\"
+		elif  i is SpinBox:
+			i.value = 0
+	set_visible(false)
+func 生成api() -> void:
+	if $\"名称\".text == \"\":
+		return
+	var rand_string :String = $\"名称\".text + str($\"可用码\".value) + str($\"使用码\".value)
+	rand_string += str(randi_range(999,9999))
+	rand_string = rand_string.md5_text()
+	$API.text = rand_string
+func 添加() -> void:
+	if $API.text == \"\":
+		return
+	$\"../Data\".添加公司($\"名称\".text, $API.text,$\"可用码\".value,$\"使用码\".value)
+	退出()
+"
+
+[sub_resource type="GDScript" id="GDScript_0xm2m"]
+script/source = "extends Node
+const 公司 = preload(\"uid://d3fr74q5hbqgo\")
+func _ready() -> void:
+	Net.客户端信息发送.connect(更新)
+func 添加公司(名称,API,可用码,使用码):
+	if Net.数据.get(名称) != null:return
+	var temp_net:= net_data.new()
+	temp_net.公司名称 = 名称
+	temp_net.API = API
+	temp_net.可用码数量 = 可用码
+	temp_net.已用码数量 = 使用码
+	Net.数据[名称] = {\"可用码\":可用码,\"使用码\":使用码,\"API\":API}
+	var temp_公司 = 公司.instantiate()
+	temp_公司.设置(temp_net)
+	$\"../滚动/容器\".add_child(temp_公司)
+	pass
+func 更新():
+	var num:int = 0
+	for i in $\"../滚动/容器\".get_children():
+		if Net.数据.get(i.my_data.公司名称) == null:
+			continue
+		i.更新(Net.数据[i.my_data.公司名称][\"可用码\"],Net.数据[i.my_data.公司名称][\"使用码\"])
+		pass
+	pass
+"
+
+[node name="MAIN" type="Control" unique_id=464238738]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ig7tw")
+test = "192.168.6.5"
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1687363273]
+visible = false
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+metadata/_edit_use_anchors_ = true
+
+[node name="添加" type="Button" parent="." unique_id=369015456]
+layout_mode = 0
+anchor_left = 0.008680556
+anchor_top = 0.015432099
+anchor_right = 0.121527776
+anchor_bottom = 0.108024694
+text = "添加账户码"
+metadata/_edit_use_anchors_ = true
+
+[node name="滚动" type="ScrollContainer" parent="." unique_id=2010594795]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.12345679
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="容器" type="VBoxContainer" parent="滚动" unique_id=1913793775]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="添加账户" type="Panel" parent="." unique_id=1400406377]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ig7tw")
+script = SubResource("GDScript_ig7tw")
+
+[node name="退出" type="Button" parent="添加账户" unique_id=1334232247]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.859375
+anchor_top = 0.027777778
+anchor_right = 0.9722222
+anchor_bottom = 0.120370366
+text = "退出"
+metadata/_edit_use_anchors_ = true
+
+[node name="添加" type="Button" parent="添加账户" unique_id=477719018]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4453125
+anchor_top = 0.875
+anchor_right = 0.5546875
+anchor_bottom = 0.9458333
+grow_horizontal = 2
+grow_vertical = 0
+text = "添加"
+metadata/_edit_use_anchors_ = true
+
+[node name="生成API" type="Button" parent="添加账户" unique_id=1155911414]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4453125
+anchor_top = 0.7777778
+anchor_right = 0.5546875
+anchor_bottom = 0.8486111
+grow_horizontal = 2
+grow_vertical = 0
+text = "生成API
+"
+metadata/_edit_use_anchors_ = true
+
+[node name="重置API" type="Button" parent="添加账户" unique_id=484847447]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4453125
+anchor_top = 0.7777778
+anchor_right = 0.5546875
+anchor_bottom = 0.8486111
+grow_horizontal = 2
+grow_vertical = 0
+text = "重置API
+"
+metadata/_edit_use_anchors_ = true
+
+[node name="API" type="LineEdit" parent="添加账户" unique_id=1884739116]
+layout_mode = 0
+anchor_left = 0.00859375
+anchor_top = 0.5694444
+anchor_right = 0.9921875
+anchor_bottom = 0.6388889
+offset_top = 3.0517578e-05
+placeholder_text = "生成API"
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="名称" type="LineEdit" parent="添加账户" unique_id=996112442]
+layout_mode = 0
+anchor_left = 0.00625
+anchor_top = 0.31944445
+anchor_right = 0.9898437
+anchor_bottom = 0.3888889
+placeholder_text = "公司名称"
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="可用码" type="SpinBox" parent="添加账户" unique_id=2082827369]
+layout_mode = 0
+anchor_left = 0.01875
+anchor_top = 0.41666666
+anchor_right = 0.26601562
+anchor_bottom = 0.5277778
+max_value = 999999999.0
+prefix = "可用码个数"
+metadata/_edit_use_anchors_ = true
+
+[node name="使用码" type="SpinBox" parent="添加账户" unique_id=2048394367]
+layout_mode = 0
+anchor_left = 0.7421875
+anchor_top = 0.41666666
+anchor_right = 0.98945314
+anchor_bottom = 0.5277778
+max_value = 999999999.0
+prefix = "已用码个数"
+metadata/_edit_use_anchors_ = true
+
+[node name="Data" type="Node" parent="." unique_id=1414166729]
+script = SubResource("GDScript_0xm2m")
+
+[connection signal="pressed" from="添加" to="添加账户" method="生成"]
+[connection signal="pressed" from="添加账户/退出" to="添加账户" method="退出"]
+[connection signal="pressed" from="添加账户/添加" to="添加账户" method="添加"]
+[connection signal="pressed" from="添加账户/生成API" to="添加账户" method="生成api"]
