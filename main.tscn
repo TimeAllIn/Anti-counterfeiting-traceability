@@ -29,6 +29,7 @@ func 添加() -> void:
 	if $API.text == \"\":
 		return
 	$\"../Data\".添加公司($\"名称\".text, $API.text,$\"可用码\".value,$\"使用码\".value)
+	Net.save_dict_to_json(\"user://server_data.json\",Net.数据)
 	退出()
 "
 

@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://bts0gyioknoxw"]
+
+[sub_resource type="GDScript" id="GDScript_ohal1"]
+script/source = "extends Control
+
+
+func _on_服务端_pressed() -> void:
+	get_tree().change_scene_to_file(\"res://main.tscn\")
+	pass # Replace with function body.
+
+
+func _on_商户端_pressed() -> void:
+	get_tree().change_scene_to_file(\"res://商户端.tscn\")
+	pass # Replace with function body.
+
+
+func _on_客户端_pressed() -> void:
+	get_tree().change_scene_to_file(\"res://用户.tscn\")
+	pass # Replace with function body.
+"
+
+[node name="初始" type="Control" unique_id=691982716]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_ohal1")
+
+[node name="服务端" type="Button" parent="." unique_id=202769894]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.34375
+anchor_top = 0.2361111
+anchor_right = 0.65625
+anchor_bottom = 0.375
+grow_horizontal = 2
+grow_vertical = 2
+text = "服务端"
+metadata/_edit_use_anchors_ = true
+
+[node name="商户端" type="Button" parent="." unique_id=2076068651]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.34375
+anchor_top = 0.43055555
+anchor_right = 0.65625
+anchor_bottom = 0.5694444
+offset_bottom = 3.0517578e-05
+grow_horizontal = 2
+grow_vertical = 2
+text = "商户端"
+metadata/_edit_use_anchors_ = true
+
+[node name="客户端" type="Button" parent="." unique_id=644623159]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.34375
+anchor_top = 0.6111111
+anchor_right = 0.65625
+anchor_bottom = 0.75
+grow_horizontal = 2
+grow_vertical = 2
+text = "用户端
+"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="服务端" to="." method="_on_服务端_pressed"]
+[connection signal="pressed" from="商户端" to="." method="_on_商户端_pressed"]
+[connection signal="pressed" from="客户端" to="." method="_on_客户端_pressed"]
