@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dd2lo7i8yvx8e"]
 
 [ext_resource type="Script" uid="uid://ccfej61qgcgpw" path="res://用户端/用户端.gd" id="1_2qhtf"]
+[ext_resource type="Texture2D" uid="uid://dyy6i5p8dxocc" path="res://debug_big.png" id="1_fcbvt"]
 
 [node name="新一级码" type="Control" unique_id=1869783523]
 layout_mode = 3
@@ -27,6 +28,7 @@ context_menu_enabled = false
 metadata/_edit_use_anchors_ = true
 
 [node name="码点图" type="TextureRect" parent="." unique_id=830116134]
+visible = false
 texture_filter = 1
 layout_mode = 1
 anchors_preset = -1
@@ -34,6 +36,7 @@ anchor_left = 0.015625
 anchor_top = 0.027777778
 anchor_right = 0.34375
 anchor_bottom = 0.60832936
+texture = ExtResource("1_fcbvt")
 expand_mode = 1
 stretch_mode = 5
 metadata/_edit_use_anchors_ = true

@@ -7,9 +7,11 @@ bg_color = Color(0.3019608, 0.3019608, 0.3019608, 1)
 
 [sub_resource type="GDScript" id="GDScript_ig7tw"]
 script/source = "extends Panel
+
 func 生成():
 	set_visible(true)
 	$\"重置API\".set_visible(false)
+	pass
 func 退出() -> void:
 	for i in get_children():
 		i.set_visible(true)
@@ -18,6 +20,7 @@ func 退出() -> void:
 		elif  i is SpinBox:
 			i.value = 0
 	set_visible(false)
+	pass
 func 生成api() -> void:
 	if $\"名称\".text == \"\":
 		return
@@ -25,31 +28,46 @@ func 生成api() -> void:
 	rand_string += str(randi_range(999,9999))
 	rand_string = rand_string.md5_text()
 	$API.text = rand_string
+	pass
+
+
+
 func 添加() -> void:
+	
 	if $API.text == \"\":
 		return
 	$\"../Data\".添加公司($\"名称\".text, $API.text,$\"可用码\".value,$\"使用码\".value)
-	Net.save_dict_to_json(\"user://server_data.json\",Net.数据)
+
 	退出()
+	pass 
 "
 
 [sub_resource type="GDScript" id="GDScript_0xm2m"]
 script/source = "extends Node
+
 const 公司 = preload(\"uid://d3fr74q5hbqgo\")
+
 func _ready() -> void:
 	Net.客户端信息发送.connect(更新)
+
 func 添加公司(名称,API,可用码,使用码):
-	if Net.数据.get(名称) != null:return
+	if Net.数据.get(名称) != null:
+		print(\"已有公司\")
+		return
 	var temp_net:= net_data.new()
 	temp_net.公司名称 = 名称
 	temp_net.API = API
 	temp_net.可用码数量 = 可用码
 	temp_net.已用码数量 = 使用码
+	
 	Net.数据[名称] = {\"可用码\":可用码,\"使用码\":使用码,\"API\":API}
+	Net.save_to_json(Net.数据, \"user://save_data.json\")
 	var temp_公司 = 公司.instantiate()
 	temp_公司.设置(temp_net)
 	$\"../滚动/容器\".add_child(temp_公司)
 	pass
+
+
 func 更新():
 	var num:int = 0
 	for i in $\"../滚动/容器\".get_children():
